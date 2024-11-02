@@ -1,0 +1,9 @@
+[submodule "libraries/glfw"]
+	path = libraries/glfw
+	url = git@github.com:glfw/glfw.git
+[submodule "libraries/glm"]
+	path = libraries/glm
+	url = git@github.com:g-truc/glm.git
+[submodule "libraries/shaderc"]
+	path = libraries/shaderc
+	url = git@github.com:google/shaderc.git
