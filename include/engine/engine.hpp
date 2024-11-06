@@ -3,7 +3,7 @@
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
-namespace Engine {
+namespace engine {
 class Engine {
 public:
   Engine();
@@ -11,13 +11,18 @@ public:
   void run();
 
 private:
-  void createInstance();
   void loop();
+
+  void createInstance();
+  void setupDebugMessenger();
+  void pickPhysicalDevice();
 
   GLFWwindow *_window;
   int _width;
   int _height;
 
   VkInstance _instance;
+  VkDebugUtilsMessengerEXT _debugMessenger;
+  VkPhysicalDevice _physicalDevice = VK_NULL_HANDLE;
 };
-} // namespace Engine
+} // namespace engine

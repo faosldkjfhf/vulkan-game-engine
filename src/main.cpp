@@ -1,12 +1,11 @@
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 #include <iostream>
-#include <stdexcept>
 
 #include "engine/engine.hpp"
 
 int main() {
-  Engine::Engine engine;
+  engine::Engine engine;
   try {
     engine.run();
   } catch (const std::exception &e) {
