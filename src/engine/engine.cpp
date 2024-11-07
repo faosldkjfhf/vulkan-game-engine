@@ -18,6 +18,7 @@ Engine::Engine() : _width(800), _height(600) {
   createInstance();
   setupDebugMessenger();
   pickPhysicalDevice();
+  createLogicalDevice();
 }
 
 Engine::~Engine() {
@@ -26,6 +27,8 @@ Engine::~Engine() {
   }
 
   vkDestroyInstance(_instance, nullptr);
+  vkDestroyDevice(_device, nullptr);
+
   glfwDestroyWindow(_window);
   glfwTerminate();
 }
@@ -43,7 +46,7 @@ void Engine::createInstance() {
     throw std::runtime_error("validation layers requested, but not available!");
   }
 
-  VkApplicationInfo appInfo;
+  VkApplicationInfo appInfo{};
   appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
   appInfo.pApplicationName = "Hello Triangle";
   appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
@@ -54,13 +57,13 @@ void Engine::createInstance() {
   auto extensions = debug::getRequiredExtensions();
 
   // instance create info
-  VkInstanceCreateInfo createInfo;
+  VkInstanceCreateInfo createInfo{};
   createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
   createInfo.pApplicationInfo = &appInfo;
   createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
   createInfo.ppEnabledExtensionNames = extensions.data();
 
-  VkDebugUtilsMessengerCreateInfoEXT debugMessengerCreateInfo;
+  VkDebugUtilsMessengerCreateInfoEXT debugMessengerCreateInfo{};
   if (debug::enableValidationLayers) {
     createInfo.enabledLayerCount =
         static_cast<uint32_t>(debug::validationLayers.size());
@@ -85,7 +88,7 @@ void Engine::setupDebugMessenger() {
   if (!debug::enableValidationLayers)
     return;
 
-  VkDebugUtilsMessengerCreateInfoEXT createInfo;
+  VkDebugUtilsMessengerCreateInfoEXT createInfo{};
   debug::populateDebugMessengerCreateInfo(createInfo);
 
   if (debug::createDebugUtilsMessengerEXT(_instance, &createInfo, nullptr,
@@ -115,6 +118,43 @@ void Engine::pickPhysicalDevice() {
   if (_physicalDevice == VK_NULL_HANDLE) {
     throw std::runtime_error("failed to find a suitable GPU!");
   }
+}
+
+void Engine::createLogicalDevice() {
+  vulkan::QueueFamilyIndices indices =
+      vulkan::findQueueFamilies(_physicalDevice);
+
+  VkDeviceQueueCreateInfo queueCreateInfo{};
+  queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+  queueCreateInfo.queueFamilyIndex = indices.graphicsFamily.value();
+  queueCreateInfo.queueCount = 1;
+  float queuePriority = 1.0f;
+  queueCreateInfo.pQueuePriorities = &queuePriority;
+
+  VkPhysicalDeviceFeatures deviceFeatures{};
+
+  VkDeviceCreateInfo createInfo{};
+  createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+  createInfo.pQueueCreateInfos = &queueCreateInfo;
+  createInfo.queueCreateInfoCount = 1;
+  createInfo.pEnabledFeatures = &deviceFeatures;
+
+  createInfo.enabledExtensionCount = 0;
+
+  if (debug::enableValidationLayers) {
+    createInfo.enabledLayerCount =
+        static_cast<uint32_t>(debug::validationLayers.size());
+    createInfo.ppEnabledLayerNames = debug::validationLayers.data();
+  } else {
+    createInfo.enabledLayerCount = 0;
+  }
+
+  if (vkCreateDevice(_physicalDevice, &createInfo, nullptr, &_device) !=
+      VK_SUCCESS) {
+    throw std::runtime_error("failed to create logical device!");
+  }
+
+  vkGetDeviceQueue(_device, indices.graphicsFamily.value(), 0, &_graphicsQueue);
 }
 
 }; // namespace engine

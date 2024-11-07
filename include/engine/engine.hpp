@@ -16,6 +16,7 @@ private:
   void createInstance();
   void setupDebugMessenger();
   void pickPhysicalDevice();
+  void createLogicalDevice();
 
   GLFWwindow *_window;
   int _width;
@@ -23,6 +24,9 @@ private:
 
   VkInstance _instance;
   VkDebugUtilsMessengerEXT _debugMessenger;
+
   VkPhysicalDevice _physicalDevice = VK_NULL_HANDLE;
+  VkDevice _device;
+  VkQueue _graphicsQueue;
 };
 } // namespace engine
