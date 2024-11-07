@@ -2,7 +2,7 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 
-#include "engine/engine.hpp"
+#include "engine.hpp"
 
 int main() {
   engine::Engine engine;

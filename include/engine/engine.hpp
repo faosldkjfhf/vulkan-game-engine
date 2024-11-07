@@ -1,7 +1,7 @@
 #pragma once
 
-#define GLFW_INCLUDE_VULKAN
-#include <GLFW/glfw3.h>
+#include "rendering/swapchain.hpp"
+#include "types.hpp"
 
 #include <optional>
 #include <vector>
@@ -18,12 +18,6 @@ struct QueueFamilyIndices {
   bool isComplete() {
     return graphicsFamily.has_value() && presentFamily.has_value();
   }
-};
-
-struct SwapChainSupportDetails {
-  VkSurfaceCapabilitiesKHR capabilities;
-  std::vector<VkSurfaceFormatKHR> formats;
-  std::vector<VkPresentModeKHR> presentModes;
 };
 
 class Engine {
@@ -45,7 +39,8 @@ private:
   bool isDeviceSuitable(VkPhysicalDevice device);
   QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
   bool checkDeviceExtensionSupport(VkPhysicalDevice device);
-  SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device);
+  rendering::SwapchainSupportDetails
+  querySwapChainSupport(VkPhysicalDevice device);
 
   VkSurfaceFormatKHR chooseSwapSurfaceFormat(
       const std::vector<VkSurfaceFormatKHR> &availableFormats);

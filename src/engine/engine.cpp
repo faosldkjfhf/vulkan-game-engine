@@ -1,6 +1,6 @@
-#include "engine/engine.hpp"
-
-#include "engine/debugUtil.hpp"
+#include "engine.hpp"
+#include "debugUtil.hpp"
+#include "rendering/swapchain.hpp"
 
 #include <algorithm>
 #include <cstring>
@@ -44,6 +44,12 @@ void Engine::run() { loop(); }
 void Engine::loop() {
   while (!glfwWindowShouldClose(_window)) {
     glfwPollEvents();
+    glfwSetKeyCallback(_window, [](GLFWwindow *window, int key, int scancode,
+                                   int action, int mods) {
+      if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+        glfwSetWindowShouldClose(window, true);
+      }
+    });
   }
 }
 
@@ -180,7 +186,7 @@ void Engine::createLogicalDevice() {
 }
 
 void Engine::createSwapChain() {
-  SwapChainSupportDetails swapChainSupport =
+  rendering::SwapchainSupportDetails swapChainSupport =
       querySwapChainSupport(_physicalDevice);
 
   VkSurfaceFormatKHR surfaceFormat =
@@ -244,7 +250,8 @@ bool Engine::isDeviceSuitable(VkPhysicalDevice device) {
 
   bool swapChainAdequate = false;
   if (extensionsSupported) {
-    SwapChainSupportDetails swapChainSupport = querySwapChainSupport(device);
+    rendering::SwapchainSupportDetails swapChainSupport =
+        querySwapChainSupport(device);
     swapChainAdequate = !swapChainSupport.formats.empty() &&
                         !swapChainSupport.presentModes.empty();
   }
@@ -303,8 +310,9 @@ bool Engine::checkDeviceExtensionSupport(VkPhysicalDevice device) {
   return requiredExtensions.empty();
 }
 
-SwapChainSupportDetails Engine::querySwapChainSupport(VkPhysicalDevice device) {
-  SwapChainSupportDetails details;
+rendering::SwapchainSupportDetails
+Engine::querySwapChainSupport(VkPhysicalDevice device) {
+  rendering::SwapchainSupportDetails details;
 
   vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, _surface,
                                             &details.capabilities);
